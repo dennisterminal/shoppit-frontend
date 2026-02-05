@@ -2,6 +2,7 @@
 import axios from "axios";
 
 //export const BASE_URL = "http://127.0.0.1:8000/";
+$backendUrl = "https://shoppit-app-4.onrender.com"
 
 export const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
 
