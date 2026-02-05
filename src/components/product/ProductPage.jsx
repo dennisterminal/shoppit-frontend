@@ -1,12 +1,12 @@
-import ProductPagePlaceHolder from "./ProductPagePlaceHolder";
-import RelatedProducts from "../product/RelatedProducts";
+import ProductPagePlaceHolder from "./ProductPagePlaceHolder.jsx";
+import RelatedProducts from "./RelatedProducts.jsx";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { BASE_URL } from "../../api";
-import api from "../../api";
+import { BASE_URL } from "../../api.js";
+import api from "../../api.js";
 import { toast } from "react-toastify";
 
-const ProductPage = ({ updateCartCount }) => { // Changed from setNumberCartItems to updateCartCount
+const ProductPage = ({ updateCartCount }) => {
   const { slug } = useParams();
   const [product, setProduct] = useState({});
   const [similarProducts, setSimilarProducts] = useState([]);
@@ -14,37 +14,25 @@ const ProductPage = ({ updateCartCount }) => { // Changed from setNumberCartItem
   const [inCart, setInCart] = useState(false);
   const cart_code = localStorage.getItem("cart_code");
 
-  useEffect(
-    function () {
-      if (product.id && cart_code) {
-        api
-          .get(
-            `product_in_cart?cart_code=${cart_code}&product_id=${product.id}`,
-          )
-          .then((res) => {
-            console.log(res.data);
-            setInCart(res.data.product_in_cart);
-          })
-          .catch((err) => {
-            console.log(err.message);
-          });
-      }
-    },
-    [cart_code, product.id],
-  );
-
-  const newItem = { cart_code: cart_code, product_id: product.id };
+  useEffect(() => {
+    if (product.id && cart_code) {
+      api.get(`product_in_cart?cart_code=${cart_code}&product_id=${product.id}`)
+        .then((res) => {
+          setInCart(res.data.product_in_cart);
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    }
+  }, [cart_code, product.id]);
 
   function add_item() {
-    api
-      .post("add_item/", newItem)
+    const newItem = { cart_code: cart_code, product_id: product.id };
+    api.post("add_item/", newItem)
       .then((res) => {
-        console.log(res.data);
         setInCart(true);
         toast.success("Product added to cart successfully!");
-        
-        // Call updateCartCount instead of setNumberCartItems
-        if (updateCartCount && typeof updateCartCount === 'function') {
+        if (updateCartCount && typeof updateCartCount === "function") {
           updateCartCount();
         }
       })
@@ -54,20 +42,14 @@ const ProductPage = ({ updateCartCount }) => { // Changed from setNumberCartItem
       });
   }
 
-  useEffect(
-    function () {
-      setLoading(true);
-      // Fetch product data based on slug
-      api.get(`/product_detail/${slug}`).then((response) => {
-        // Handle the response data
-        console.log(response.data);
-        setProduct(response.data);
-        setSimilarProducts(response.data.similar_products);
-        setLoading(false);
-      });
-    },
-    [slug],
-  );
+  useEffect(() => {
+    setLoading(true);
+    api.get(`/product_detail/${slug}`).then((response) => {
+      setProduct(response.data);
+      setSimilarProducts(response.data.similar_products);
+      setLoading(false);
+    });
+  }, [slug]);
 
   if (loading) {
     return <ProductPagePlaceHolder />;
