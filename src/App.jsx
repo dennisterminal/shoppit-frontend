@@ -21,7 +21,7 @@ const App = () => {
   const updateCartCount = () => {
     if (cart_code) {
       api
-        .get(`get_cart?cart_code=${cart_code}`)
+        .get(`get_cart/?cart_code=${cart_code}`)
         .then((res) => {
           setNumberCartItems(res.data.items.length);
         })
