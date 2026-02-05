@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+﻿import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import HomePage from "./components/home/HomePage";
 import NotFoundPage from "./components/ui/NotFoundPage";
@@ -30,26 +30,23 @@ const App = () => {
   const cart_code = localStorage.getItem("cart_code");
 
   const updateCartCount = () => {
-    if (cart_code) {
-      api
-        .get(`get_cart/?cart_code=${cart_code}`)
-        .then((res) => {
-          // Check if items exists and is an array
-          if (res.data && res.data.items && Array.isArray(res.data.items)) {
-            setNumberCartItems(res.data.items.length);
-          } else {
-            // Cart doesn"t exist or has no items
-            setNumberCartItems(0);
-          }
-        })
-        .catch((err) => {
-          console.log(err.message);
-          setNumberCartItems(0);
-        });
-    } else {
-      setNumberCartItems(0);
-    }
-  };
+  if (cart_code) {
+    api
+      .get(`get_cart/?cart_code=${cart_code}`)
+      .then((res) => {
+        // Safe way to get items count
+        const itemsCount = res.data?.items?.length || 0;
+        setNumberCartItems(itemsCount);
+      })
+      .catch((err) => {
+        console.log(err.message);
+        setNumberCartItems(0);
+      });
+  } else {
+    setNumberCartItems(0);
+  }
+};
+
 
   useEffect(() => {
     updateCartCount();
